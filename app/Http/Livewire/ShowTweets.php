@@ -3,6 +3,8 @@
 namespace App\Http\Livewire;
 
 use App\Models\Tweet;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,7 +21,7 @@ class ShowTweets extends Component
 
     public function render()
     {
-        $tweets = Tweet::with('user')->paginate(5);
+        $tweets = Tweet::with('user')->latest()->paginate(5);
 
         return view('livewire.show-tweets', compact('tweets'));
     }
@@ -28,10 +30,15 @@ class ShowTweets extends Component
     public function create() {
 
         $this->validate();
-        Tweet::create([
-            'content' => $this->content,
-            'user_id' => 1,
+
+        auth()->user()->tweets()->create([
+            'content' => $this->content
         ]);
+
+        // Tweet::create([
+        //     'content' => $this->content,
+        //     'user_id' => Auth::id(),
+        // ]);
 
         $this->content = '';
     }
